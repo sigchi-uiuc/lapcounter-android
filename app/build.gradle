@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.sigchi.lapcounter"
-        minSdkVersion 17
+        minSdkVersion 18
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -17,6 +17,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    repositories {
+        maven {
+            url "https://dl.bintray.com/alt236/maven"
+        }
+    }
 }
 
 dependencies {
@@ -24,4 +29,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
+    compile 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
 }
