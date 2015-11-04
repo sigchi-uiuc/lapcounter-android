@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.sigchi.lapcounter"
         minSdkVersion 18
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
@@ -29,5 +29,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
-    compile 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
+    compile 'com.github.pwittchen:reactivebeacons:0.3.0'
+    compile 'io.reactivex:rxjava:1.0.14'
+    compile 'io.reactivex:rxandroid:1.0.1'
+
 }
