@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.pwittchen.reactivebeacons.library.Beacon;
+import com.github.pwittchen.reactivebeacons.library.Proximity;
 import com.github.pwittchen.reactivebeacons.library.ReactiveBeacons;
 
 import java.util.ArrayList;
@@ -26,11 +27,13 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String ITEM_FORMAT = "MAC: %s";
+    private static final String ITEM_FORMAT = "Address: %s, RSSI: %d\ndistance: %.2fm, proximity: %s\n%s";
     private ReactiveBeacons reactiveBeacons;
     private Subscription subscription;
     private ListView deviceList;
     private Map<String, Beacon> beacons;
+    private int time;
+    private TextView timeDisplay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        timeDisplay = (TextView) findViewById(R.id.lapTime);
 
         if (!reactiveBeacons.isBluetoothEnabled()) {
             reactiveBeacons.requestBluetoothAccess(this);
@@ -84,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshBeaconList() {
-
         List<String> list = new ArrayList<>();
+        //Toast.makeText(getApplicationContext(), "Scanning for bluetooh", Toast.LENGTH_LONG).show();
 
         for (Beacon beacon : beacons.values()) {
             list.add(getBeaconItemString(beacon));
@@ -96,8 +101,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getBeaconItemString(Beacon beacon) {
-        String mac = beacon.device.getAddress();
-        return String.format(ITEM_FORMAT, mac);
+        String address = beacon.device.getAddress();
+        String name = beacon.device.getName();
+        int rssi = beacon.rssi;
+        double distance = beacon.getDistance();
+        Proximity proximity = beacon.getProximity();
+        return String.format(ITEM_FORMAT, address, rssi, distance, proximity, name);
     }
 
 }
