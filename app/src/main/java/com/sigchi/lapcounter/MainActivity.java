@@ -1,6 +1,9 @@
 package com.sigchi.lapcounter;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -15,10 +18,13 @@ import com.github.pwittchen.reactivebeacons.library.Beacon;
 import com.github.pwittchen.reactivebeacons.library.Proximity;
 import com.github.pwittchen.reactivebeacons.library.ReactiveBeacons;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -90,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshBeaconList() {
         List<String> list = new ArrayList<>();
-        //Toast.makeText(getApplicationContext(), "Scanning for bluetooh", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "Scanning for bluetooth", Toast.LENGTH_LONG).show();
 
         for (Beacon beacon : beacons.values()) {
             list.add(getBeaconItemString(beacon));
@@ -101,12 +107,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getBeaconItemString(Beacon beacon) {
-        String address = beacon.device.getAddress();
+        String uuid = "";
+        try{
+            uuid = beacon.device.getUuids()[0].getUuid().toString();
+        }catch (Exception e){
+            uuid = "No UUID";
+        }
+
+        //String address = beacon.device.getAddress();
         String name = beacon.device.getName();
         int rssi = beacon.rssi;
         double distance = beacon.getDistance();
         Proximity proximity = beacon.getProximity();
-        return String.format(ITEM_FORMAT, address, rssi, distance, proximity, name);
+        return String.format(ITEM_FORMAT, uuid, rssi, distance, proximity, name);
     }
 
 }
