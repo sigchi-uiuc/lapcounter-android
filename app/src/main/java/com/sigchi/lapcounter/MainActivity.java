@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         ListView deviceList = (ListView) findViewById(R.id.deviceList);
         devices = new ArrayList<>();
         if(devices.size() == 0) {
-            devices.add(new DeviceItem("No Devices", ""));
+            devices.add(new DeviceItem("No Devices", "No devices"));
         }
         adapter = new DeviceItemAdapter(getApplicationContext(), devices);
         deviceList.setAdapter(adapter);

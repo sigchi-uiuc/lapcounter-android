@@ -4,7 +4,13 @@
     android:layout_height="match_parent" >
     <TextView
         android:id="@+id/deviceAddress"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Address" />
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:paddingLeft="14dp"
+        android:paddingRight="14dp"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:text="Address"
+        android:textColor="@color/colorPrimaryDark"/>
 </LinearLayout>
