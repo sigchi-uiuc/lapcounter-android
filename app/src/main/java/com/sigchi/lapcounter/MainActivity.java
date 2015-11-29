@@ -2,6 +2,9 @@ package com.sigchi.lapcounter;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
@@ -24,20 +28,14 @@ public class MainActivity extends AppCompatActivity {
     private DeviceItemAdapter adapter;
     private ArrayList<DeviceItem> devices;
     private BluetoothAdapter BTAdapter;
+    private BluetoothLeScanner leScanner;
 
-    private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
+    private final ScanCallback callback = new ScanCallback() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                Log.d("DEVICELIST", "Bluetooth device found\n");
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // Create a new device item
-                DeviceItem newDevice = new DeviceItem(device.getName(), device.getAddress());
-                // Add it to our adapter
-                devices.add(newDevice);
-                adapter.notifyDataSetChanged();
-            }
+        public void onScanResult(int callbackType, ScanResult result) {
+            BluetoothDevice device = result.getDevice();
+            DeviceItem item = new DeviceItem(device.getName(), device.getAddress());
+            devices.add(item);
         }
     };
 
@@ -49,19 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         BTAdapter = BluetoothAdapter.getDefaultAdapter();
+        leScanner = BTAdapter.getBluetoothLeScanner();
 
-        if (BTAdapter == null) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Not compatible")
-                    .setMessage("Your phone does not support Bluetooth")
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            System.exit(0);
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
         if (!BTAdapter.isEnabled()) {
             Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBT, REQUEST_BLUETOOTH);
@@ -79,14 +66,13 @@ public class MainActivity extends AppCompatActivity {
         startScan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 if (isChecked) {
                     adapter.clear();
-                    registerReceiver(bReceiver, filter);
-                    BTAdapter.startDiscovery();
+                    leScanner.startScan(callback);
+                    Log.i("Start Scan", "Now Scanning for devices");
+                    Toast.makeText(getApplicationContext(), "Now scanning", Toast.LENGTH_LONG).show();
                 } else {
-                    unregisterReceiver(bReceiver);
-                    BTAdapter.cancelDiscovery();
+                    leScanner.stopScan(callback);
                 }
             }
         });
