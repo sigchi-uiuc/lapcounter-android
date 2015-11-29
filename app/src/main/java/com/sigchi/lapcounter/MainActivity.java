@@ -5,13 +5,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     public static int REQUEST_BLUETOOTH = 1;
     private DeviceItemAdapter adapter;
     private ArrayList<DeviceItem> devices;
-    private BluetoothAdapter BTAdapter;
     private BluetoothLeScanner leScanner;
 
     private final ScanCallback callback = new ScanCallback() {
@@ -36,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
             BluetoothDevice device = result.getDevice();
             DeviceItem item = new DeviceItem(device.getName(), device.getAddress());
             devices.add(item);
+            adapter.notifyDataSetChanged();
         }
     };
 
@@ -46,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        BTAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
         leScanner = BTAdapter.getBluetoothLeScanner();
 
         if (!BTAdapter.isEnabled()) {
