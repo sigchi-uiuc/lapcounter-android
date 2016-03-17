@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LapCounter.iml" filepath="$PROJECT_DIR$/LapCounter.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lapcounter-android.iml" filepath="$PROJECT_DIR$/lapcounter-android.iml" />
     </modules>
   </component>
 </project>

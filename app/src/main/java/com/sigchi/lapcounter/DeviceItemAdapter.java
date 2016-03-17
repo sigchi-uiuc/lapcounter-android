@@ -29,7 +29,7 @@ public class DeviceItemAdapter extends ArrayAdapter<DeviceItem> {
         // Lookup view for data population
         TextView macAddress = (TextView) convertView.findViewById(R.id.deviceAddress);
         // Populate the data into the template view using the data object
-        macAddress.setText(device.getAddress());
+        macAddress.setText(device.getAddress() + ":" + device.getDeviceName());
         // Return the completed view to render on screen
         return convertView;
     }

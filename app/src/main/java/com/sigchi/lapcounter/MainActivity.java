@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -19,18 +20,58 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    String ADDRESS_1 = "00:1A:7D:DA:71:13";
+    String ADDRESS_2 = "34:4D:F7:46:B3:AA";
+
+    private String lastAddr;
+    private int lapCount;
+    private Boolean halfLap;
+    private Boolean started;
+    private long startTime;
+    private double lapTime;
+    ArrayList<Double> times;
+
     public static int REQUEST_BLUETOOTH = 1;
     private DeviceItemAdapter adapter;
     private ArrayList<DeviceItem> devices;
     private BluetoothLeScanner leScanner;
 
+    TextView lapCountView;
+    TextView lapTimeView;
+
     private final ScanCallback callback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
+
             BluetoothDevice device = result.getDevice();
             DeviceItem item = new DeviceItem(device.getName(), device.getAddress());
-            devices.add(item);
-            adapter.notifyDataSetChanged();
+            if(device.getAddress().equals(ADDRESS_1) || device.getAddress().equals(ADDRESS_2)) {
+                devices.add(item);
+                adapter.notifyDataSetChanged();
+                if(!device.getAddress().equals(lastAddr)) {
+                    if(halfLap) {
+                        lapCount++;
+                        halfLap = false;
+                        lapTime = (System.currentTimeMillis() - startTime) / 1000;
+                        startTime = System.currentTimeMillis();
+                        lastAddr = device.getAddress();
+                        lapCountView.setText("Laps: " + lapCount);
+                        lapTimeView.setText("Time: " + lapTime);
+                        Log.d("Bluetooth", "Detected device " + device.getAddress());
+                    }
+                    else {
+                        halfLap = true;
+                        lastAddr = device.getAddress();
+                        Log.d("Bluetooth", "Detected device" + device.getAddress());
+                    }
+                    if(!started) {
+                        lapCountView.setText("Laps:" + lapCount);
+                        startTime = System.currentTimeMillis();
+                        lastAddr = device.getAddress();
+                        Log.d("Bluetooth", "Detected device" + device.getAddress());
+                    }
+                }
+            }
         }
     };
 
@@ -40,6 +81,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        lastAddr = "";
+        lapCount = 0;
+        halfLap = false;
+        started = false;
+        lapTime = 0;
+
+        lapTimeView = (TextView) findViewById(R.id.lapTime);
+        lapCountView = (TextView) findViewById(R.id.num_laps);
+
+        times = new ArrayList<>();
 
         BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
         leScanner = BTAdapter.getBluetoothLeScanner();
@@ -51,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListView deviceList = (ListView) findViewById(R.id.deviceList);
         devices = new ArrayList<>();
+
         if(devices.size() == 0) {
             devices.add(new DeviceItem("No Devices", "No devices"));
         }
@@ -62,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    lapCountView.setText("Searching for Device");
                     adapter.clear();
                     leScanner.startScan(callback);
                     Log.i("Start Scan", "Now Scanning for devices");
