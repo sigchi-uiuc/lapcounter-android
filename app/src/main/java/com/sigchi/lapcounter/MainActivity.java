@@ -16,12 +16,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     String ADDRESS_1 = "00:1A:7D:DA:71:13";
-    String ADDRESS_2 = "34:4D:F7:46:B3:AA";
+    String ADDRESS_2 = "";
+
+    String baseURL = "";
+    RequestQueue queue;
 
     private String lastAddr;
     private int lapCount;
@@ -82,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        queue = Volley.newRequestQueue(this);
+
         lastAddr = "";
         lapCount = 0;
         halfLap = false;
@@ -127,6 +139,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * Use to send lap data to the server
+     * @param user User who completed the lap
+     * @param userLapTime Duration of the lap
+     */
+    private void sendLapDataToServer(String user, int userLapTime) {
+        final String sendURL = baseURL + "/" + user + "/true/0/" + userLapTime;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, sendURL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("sendLapDataToServer", sendURL);
+                        Log.d("Response", response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("sendLapDataToServer", error.getMessage());
+            }
+        });
+        queue.add(stringRequest);
+    }
 
 }
